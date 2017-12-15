@@ -1,0 +1,597 @@
+<?php
+
+
+function reboot_tools_menu() {
+    $items = array();
+
+    $items['tools/server-response-checker'] = array(
+        'title' => "Server Response Checker",
+        'page callback' => "reboot_tools_src",
+        'access arguments' => array('access content'),
+        'type' => MENU_NORMAL_ITEM,
+    );
+
+    $items['tools/domain-stripper'] = array(
+        'title' => "Domain Stripper",
+        'page callback' => "reboot_tools_stripper",
+        'access arguments' => array('access content'),
+        'type' => MENU_NORMAL_ITEM,
+    );    
+
+    /*$items['tools/server-response-checker/result'] = array(
+        'title' => "Server Response Checker",
+        'page callback' => "reboot_tools_src_result",
+        'access arguments' => array('access content'),
+        'type' => MENU_NORMAL_ITEM,
+    );*/
+
+    return $items;
+}
+
+function reboot_tools_src() {
+    $output = drupal_get_form('reboot_tools_src_add_form');
+    return $output;
+}
+
+function reboot_tools_stripper() {
+    $output = drupal_get_form('reboot_tools_stripper_add_form');
+    return $output;    
+}
+
+/*function reboot_tools_src_result($form,$form_state) {
+    return $returnx;
+} */
+
+function reboot_tools_stripper_add_form($form_state) {
+    $form = array();
+    $form_state['rebuild'] = TRUE;
+
+    if (!empty($form_state['values']['url'])) {
+            $urls = explode("\n", $form_state['values']['url']);
+
+            foreach ($urls as $url) {
+                $result = parse_url($url);
+                $domain = preg_replace('#^www\.(.+\.)#i', '$1', $result['host']);
+                $output .= str_replace('_', '', $domain) . "\n";
+            }
+            $form[$url] = array(
+                '#type' => 'textarea',
+                '#value' => $output, //'#value' => '<div class="result">' . $domain . '</div>',
+            );
+    }
+    else {
+        $form['url'] = array(
+            '#type' => 'textarea',
+            '#title' => 'URL(s)',
+            '#size' => 50,
+            '#required' => TRUE,
+            '#description' => 'Please enter one URL per line (separate URLs by \'enter\' key). You can enter unlimited number of urls.',        
+        );
+        $form['submit'] = array(
+            '#prefix' => '<div id="src">',
+            '#type' => 'submit',
+            '#value' => 'Check',
+            '#suffix' => '</div>',
+        );
+    }
+    
+    $form['#attributes'] = array('class' => 'reboot-tools-stripper-add-form');
+
+    return $form;
+}
+
+function reboot_tools_src_add_form($form_state) {
+    $form = array();
+    $form_state['rebuild'] = TRUE;
+
+
+    // If the form has been submitted, output result
+    if (!empty($form_state['values']['url'])) {
+        $form[$url] = array(
+            '#value' => reboot_tools_src_result($form_state),
+        );
+    }
+    //Else normal form
+    else {
+            $form['url'] = array(
+                '#title' => 'URL(s)',
+                '#type' => 'textarea',
+                '#size' => 50,
+                '#required' => TRUE,
+                '#description' => 'Please enter one URL per line (separate URLs by \'enter\' key). Include "http", example: http://www.rebootonline.com. Maximum number of URLS: 10. No spaces allowed.',
+            );
+
+            $form['submit'] = array(
+                '#prefix' => '<div id="src">',
+                '#type' => 'submit',
+                '#value' => 'Check',
+                '#suffix' => '</div>',
+            );  
+
+            $form['#attributes'] = array('class' => 'reboot-tools-src-add-form');
+    }
+    return $form;
+}
+
+
+function reboot_tools_src_result(&$form_state) {
+$urls = explode("\n", $form_state['values']['url']);
+//foreach ($urls as $url) {
+    
+        $getheader1 =  get_headers(trim($urls[0]), 1);
+        $getheader2 =  get_headers(trim($urls[1]), 1);
+        $getheader3 =  get_headers(trim($urls[2]), 1);
+        $getheader4 =  get_headers(trim($urls[3]), 1);
+        $getheader5 =  get_headers(trim($urls[4]), 1);
+        $getheader6 =  get_headers(trim($urls[5]), 1);
+        $getheader7 =  get_headers(trim($urls[6]), 1);
+        $getheader8 =  get_headers(trim($urls[7]), 1);
+        $getheader9 =  get_headers(trim($urls[8]), 1);
+        $getheader10 =  get_headers(trim($urls[9]), 1);
+
+        /*FALBACK. Incase non-existent URL is entered*/
+        if (!$getheader1 && $urls[0]) {
+            $getheader1 = array('Unable to fetch. Please check if you entered a valid URL'); //Should be an array to get through the foreach conditions below. I know hackish..
+        }
+        if (!$getheader2 && $urls[1]) {
+            $getheader2 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+        if (!$getheader3 && $urls[2]) {
+            $getheader3 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+        if (!$getheader4 && $urls[3]) {
+            $getheader4 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+        if (!$getheader5 && $urls[4]) {
+            $getheader5 = array('Unable to fetch. Please check if you entered a valid URL');
+        }        
+        if (!$getheader6 && $urls[5]) {
+            $getheader6 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+        if (!$getheader7 && $urls[6]) {
+            $getheader7 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+        if (!$getheader8 && $urls[7]) {
+            $getheader8 = array('Unable to fetch. Please check if you entered a valid URL');
+        }        
+        if (!$getheader9 && $urls[8]) {
+            $getheader9 = array('Unable to fetch. Please check if you entered a valid URL');
+        }        
+        if (!$getheader10 && $urls[9]) {
+            $getheader10 = array('Unable to fetch. Please check if you entered a valid URL');
+        }
+
+        //$getheader1
+        foreach ($getheader1 as $key => $header_site1) {
+            if (is_array($header_site1)) {
+                $i = 1;
+                foreach ($header_site1 as $value) {
+                    if ($i == 1) {
+                        $header_val_site1 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site1 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i1 == 0) {
+                    $header_val_site1 .= '<strong>Server Response</strong><br>' . $header_site1 . '<br><br>';
+                }
+                else {
+                    $header_val_site1 .= '<strong>' . $key . '</strong><br>' . $header_site1 . '<br><br>';
+                }
+            }
+            $i1++;
+        }
+
+        //$getheader2
+        foreach ($getheader2 as $key => $header_site2) {
+            if (is_array($header_site2)) {
+                $i = 1;
+                foreach ($header_site2 as $value) {
+                    if ($i == 1) {
+                        $header_val_site2 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site2 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i2 == 0) {
+                    $header_val_site2 .= '<strong>Server Response</strong><br>' . $header_site2 . '<br><br>';
+                }
+                else {
+                    $header_val_site2 .= '<strong>' . $key . '</strong><br>' . $header_site2 . '<br><br>';
+                }
+            }
+            $i2++;
+        }
+
+        //$getheader3
+        foreach ($getheader3 as $key => $header_site3) {
+            if (is_array($header_site3)) {
+                $i = 1;
+                foreach ($header_site3 as $value) {
+                    if ($i == 1) {
+                        $header_val_site3 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site3 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i3 == 0) {
+                    $header_val_site3 .= '<strong>Server Response</strong><br>' . $header_site3 . '<br><br>';
+                }
+                else {
+                    $header_val_site3 .= '<strong>' . $key . '</strong><br>' . $header_site3 . '<br><br>';
+                }
+            }
+            $i3++;
+        }
+
+        //$getheader4
+        foreach ($getheader4 as $key => $header_site4) {
+            if (is_array($header_site4)) {
+                $i = 1;
+                foreach ($header_site4 as $value) {
+                    if ($i == 1) {
+                        $header_val_site4 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site4 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i4 == 0) {
+                    $header_val_site4 .= '<strong>Server Response</strong><br>' . $header_site4 . '<br><br>';
+                }
+                else {
+                    $header_val_site4 .= '<strong>' . $key . '</strong><br>' . $header_site4 . '<br><br>';
+                }
+            }
+            $i4++;
+        }
+
+        //$getheader5
+        foreach ($getheader5 as $key => $header_site5) {
+            if (is_array($header_site5)) {
+                $i = 1;
+                foreach ($header_site5 as $value) {
+                    if ($i == 1) {
+                        $header_val_site5 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site5 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i5 == 0) {
+                    $header_val_site5 .= '<strong>Server Response</strong><br>' . $header_site5 . '<br><br>';
+                }
+                else {
+                    $header_val_site5 .= '<strong>' . $key . '</strong><br>' . $header_site5 . '<br><br>';
+                }
+            }
+            $i5++;
+        }
+
+        //$getheader6
+        foreach ($getheader6 as $key => $header_site6) {
+            if (is_array($header_site6)) {
+                $i = 1;
+                foreach ($header_site6 as $value) {
+                    if ($i == 1) {
+                        $header_val_site6 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site6 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i6 == 0) {
+                    $header_val_site6 .= '<strong>Server Response</strong><br>' . $header_site6 . '<br><br>';
+                }
+                else {
+                    $header_val_site6 .= '<strong>' . $key . '</strong><br>' . $header_site6 . '<br><br>';
+                }
+            }
+            $i6++;
+        }
+
+        //$getheader7
+        foreach ($getheader7 as $key => $header_site7) {
+            if (is_array($header_site7)) {
+                $i = 1;
+                foreach ($header_site7 as $value) {
+                    if ($i == 1) {
+                        $header_val_site7 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site7 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i7 == 0) {
+                    $header_val_site7 .= '<strong>Server Response</strong><br>' . $header_site7 . '<br><br>';
+                }
+                else {
+                    $header_val_site7 .= '<strong>' . $key . '</strong><br>' . $header_site7 . '<br><br>';
+                }
+            }
+            $i7++;
+        }
+
+        //$getheader8
+        foreach ($getheader8 as $key => $header_site8) {
+            if (is_array($header_site8)) {
+                $i = 1;
+                foreach ($header_site8 as $value) {
+                    if ($i == 1) {
+                        $header_val_site8 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site8 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i8 == 0) {
+                    $header_val_site8 .= '<strong>Server Response</strong><br>' . $header_site8 . '<br><br>';
+                }
+                else {
+                    $header_val_site8 .= '<strong>' . $key . '</strong><br>' . $header_site8 . '<br><br>';
+                }
+            }
+            $i8++;
+        }
+
+        //$getheader9
+        foreach ($getheader9 as $key => $header_site9) {
+            if (is_array($header_site9)) {
+                $i = 1;
+                foreach ($header_site9 as $value) {
+                    if ($i == 1) {
+                        $header_val_site9 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site9 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i9 == 0) {
+                    $header_val_site9 .= '<strong>Server Response</strong><br>' . $header_site9 . '<br><br>';
+                }
+                else {
+                    $header_val_site9 .= '<strong>' . $key . '</strong><br>' . $header_site9 . '<br><br>';
+                }
+            }
+            $i9++;
+        }
+
+        //$getheader10
+        foreach ($getheader10 as $key => $header_site10) {
+            if (is_array($header_site10)) {
+                $i = 1;
+                foreach ($header_site10 as $value) {
+                    if ($i == 1) {
+                        $header_val_site10 .= '<strong>' . $key . '</strong><br>' . $value . '<br>';//Only print first key.
+                    }
+                    else {
+                        $header_val_site10 .= $value . '<br><br>';
+                    }
+                    $i++;
+                }
+            }
+            else {
+                if ($i10 == 0) {
+                    $header_val_site10 .= '<strong>Server Response</strong><br>' . $header_site10 . '<br><br>';
+                }
+                else {
+                    $header_val_site10 .= '<strong>' . $key . '</strong><br>' . $header_site10 . '<br><br>';
+                }
+            }
+            $i10++;
+        }             
+
+
+        $output[] = $header_val_site1;
+        $output[] = $header_val_site2;
+        $output[] = $header_val_site3;
+        $output[] = $header_val_site4;
+        $output[] = $header_val_site5;
+        $output[] = $header_val_site6;
+        $output[] = $header_val_site7;
+        $output[] = $header_val_site8;
+        $output[] = $header_val_site9;
+        $output[] = $header_val_site10;       
+
+//}
+
+        if (!$output[0]) {
+            //return 'No URL provided';
+        }
+
+         if ($output[9]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[5] . '</div><p>' . $output[5] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[6] . '</div><p>' . $output[6] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[7] . '</div><p>' . $output[7] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[8] . '</div><p>' . $output[8] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[9] . '</div><p>' . $output[9] . '</p></div><br>';
+        }        
+
+         if ($output[8]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[5] . '</div><p>' . $output[5] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[6] . '</div><p>' . $output[6] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[7] . '</div><p>' . $output[7] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[8] . '</div><p>' . $output[8] . '</p></div><br>';
+        }
+
+         if ($output[7]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[5] . '</div><p>' . $output[5] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[6] . '</div><p>' . $output[6] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[7] . '</div><p>' . $output[7] . '</p></div><br>';
+        }
+
+         if ($output[6]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[5] . '</div><p>' . $output[5] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[6] . '</div><p>' . $output[6] . '</p></div><br>';
+        }        
+
+         if ($output[5]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[5] . '</div><p>' . $output[5] . '</p></div><br>';
+        }
+
+         if ($output[4]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[4] . '</div><p>' . $output[4] . '</p></div><br>';
+        }
+
+         if ($output[3]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[3] . '</div><p>' . $output[3] . '</p></div><br>';
+        }
+
+         if ($output[2]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[2] . '</div><p>' . $output[2] . '</p></div><br>';          
+        }
+
+         if ($output[1]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>' .
+                '<div class="src"> <div class="h">' . $urls[1] . '</div><p>' . $output[1] . '</p></div><br>';              
+        }
+
+         if ($output[0]) {
+            return
+                '<div class="src"> <div class="h">' . $urls[0] . '</div><p>' . $output[0] . '</p></div><br>';
+        }
+
+
+
+}
+
+
+/*Validation*/
+function reboot_tools_src_add_form_validate($form,$form_state){
+        if (strpos($form_state['values']['url'], " ") !== FALSE || strpos($form_state['values']['url'], "http") === FALSE) {
+            form_set_error('', 'You have entered an invalid URL.');
+        }
+}
+
+function reboot_tools_stripper_add_form_validate($form,$form_state){
+        if (strpos($form_state['values']['url'], " ") !== FALSE || strpos($form_state['values']['url'], "http") === FALSE) {
+            form_set_error('', 'You have entered an invalid URL.');
+        }
+}
+
+/*Submit handler*/
+function reboot_tools_src_add_form_submit($form,$form_state) {
+    $form_state['rebuild'] = TRUE;
+}
+
+/*VIEWS*/
+function reboot_tools_views_pre_render(&$view) {
+
+    //dpm($view->field['field_avg_total_move_value']->query);
+    //dpm($view->field['field_avg_total_move_value']);
+    //dpm($view->style_plugin->view);
+
+
+  //switch ($view->name) {
+    //case 'google_quake_seismometer':    
+      //$titles = $view->field['title']->view->result[0]->node_title;
+    //dpm($view);
+    //dpm($view->field['field_avg_total_move_value']); //->view->field['field_avg_total_move_value']);
+    //dpm($view->field['field_avg_total_move_value']->view->field['title']);
+
+        //$label = $view->style_options['views_charts_x_labels']; //$view->field['title']->view->result[0]->node_title;
+              //$view->field['field_avg_total_move_value']->options['label'][0] = $label;
+              //$view->field['field_avg_total_move_value']->options[1]['label'] = 'Two';
+     //break;
+  //}
+}
+
+function reboot_tools_form_alter(&$form, &$form_state, $form_id) {
+
+    switch ($form['#id']) {
+        case 'views-exposed-form-google-quake-seismometer-page-2';
+            $form['domain']['#type'] = 'select';
+            $result = db_query("SELECT title FROM node WHERE type='gqs_item' ORDER BY title ASC");
+            $titles = array();
+            while ($row = db_fetch_object($result)) {
+                $titles[$row->title] = $row->title;
+            }
+            $more = array('- None -' => '- Please choose -');
+            $all = array_merge($more,$titles);
+            $form['domain']['#options'] = $all;
+            $form['domain']['#size'] = NULL;
+            $form['domain']['#default_value'] = '- None -';
+            break;
+    }
+}
+
+function reboot_tools_init() {
+    $path = $_GET['q'];
+    switch ($path) {
+        case 'tools/google-quake-seismometer':
+            break;
+    }
+}
